@@ -58,12 +58,46 @@ blockquote footer {
   max-height: 800px;
   margin: 10% auto auto auto;
 }
+.footer-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+}
+.footer-container p {
+  color: #fff;
+  text-align: center;
+  font-size: 18px;
+}
+.footer-container a {
+  color: #fff;
+  text-decoration: none;
+}
+.footer-container a:hover {
+  text-decoration: underline;
+}
+.footer-container a:active {
+  color: #fff;
+}
+.footer-container a:focus {
+  outline: none;
+}
+
+.form .love {
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+  padding: 10px 0;
+  color: white;
+}
+
 .quotebox {
   background: #fff;
-  max-width: 500px;
+  max-width: 600px;
   min-height: 100px;
   border: 1px solid #222;
-  border-radius: 5px;
+  border-radius: 15px;
   margin: 10px;
 }
 
@@ -97,7 +131,7 @@ blockquote footer {
   transition: all 0.3s ease-in-out;
 }
 .social-icons.icon-rounded .fa {
-  border-radius: 5px;
+  border-radius: 50%;
 }
 .social-icons .fa:hover,
 .social-icons .fa:active {

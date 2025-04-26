@@ -89,10 +89,9 @@ function getQuote() {
       },
       500
     );
-    $("#newquote, .social-icons .fa-twitter").animate(
-      { backgroundColor: colors[randomcolor] },
-      500
-    );
+    $(
+      "#newquote, .social-icons .fa-twitter, .social-icons .fa-volume-up, .social-icons .fa-copy"
+    ).animate({ backgroundColor: colors[randomcolor] }, 500);
     $("blockquote footer").animate({ color: colors[randomcolor] }, 500);
     $("blockquote").animate({ borderLeftColor: colors[randomcolor] }, 500);
     $("#quotetext").animate({ opacity: 0 }, 500, function () {
@@ -119,7 +118,9 @@ getQuote();
 $(document).ready(function () {
   $("#newquote").on("click", getQuote);
   $("#tweetquote").on("click", function () {
+    console.log("Tweeting");
     if (!inIframe()) {
+      console.log("Tweeting from main window");
       openURL(
         "https://twitter.com/intent/tweet?hashtags=quotes&related=freecodecamp&text=" +
           encodeURIComponent('"' + currentQuote + '" ' + currentAuthor)
