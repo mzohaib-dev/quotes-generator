@@ -27,81 +27,82 @@ var colors = [
   "#73A857",
 ];
 
-var quotes = [
-  ["You only live once, but if you do it right, once is enough.", "Mae West"],
-  [
-    "I am so clever that sometimes I don't understand a single word of what I am saying.",
-    "Oscar Wilde",
-  ],
-  [
-    "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe.",
-    "Albert Einstein",
-  ],
-  [
-    "The most beautiful experience we can have is the mysterious. It is the fundamental emotion that stands at the cradle of true art and true science.",
-    "Albert Einstein",
-  ][
-    ("It is our choices, Harry, that show what we truly are, far more than our abilities.",
-    "J.K. Rowling, Harry Potter and the Chamber of Secrets")
-  ],
-  [
-    "All men who have turned out worth anything have had the chief hand in their own education.",
-    "Walter Scott",
-  ],
-  ["Trust yourself. You know more than you think you do.", "Benjamin Spock"],
-  [
-    "No one can make you feel inferior without your consent.",
-    "Eleanor Roosevelt, This is My Story",
-  ],
-  [
-    "To be yourself in a world that is constantly trying to make you something else is the greatest accomplishment.",
-    "Ralph Waldo Emerson",
-  ],
-  [
-    "Twenty years from now you will be more disappointed by the things that you didn't do than by the ones you did do. So throw off the bowlines. Sail away from the safe harbor. Catch the trade winds in your sails. Explore. Dream. Discover.",
-    "H. Jackson Brown Jr., P.S. I Love You",
-  ],
-];
-
 var currentQuote = "";
 var currentAuthor = "";
-var randomquote = "";
 var randomcolor = "";
 
+// Updated getQuote function to use API
 function getQuote() {
-  randomquote = Math.floor(Math.random() * quotes.length);
-  randomcolor = Math.floor(Math.random() * colors.length);
-  currentQuote = quotes[randomquote][0];
-  currentAuthor = quotes[randomquote][1];
-  if (inIframe()) {
-    $("#tweet-quote").attr(
-      "href",
-      "https://twitter.com/intent/tweet?hashtags=quotes&related=aLamm&text=" +
-        encodeURIComponent('"' + currentQuote + '" ' + currentAuthor)
-    );
-  }
+  // Show loading state
+  $("#newquote").html("Loading...").prop("disabled", true);
 
-  $(document).ready(function () {
-    $("html body").animate(
-      {
-        backgroundColor: colors[randomcolor],
-        color: colors[randomcolor],
-      },
-      500
-    );
-    $(
-      "#newquote, .social-icons .fa-twitter, .social-icons .fa-volume-up, .social-icons .fa-copy"
-    ).animate({ backgroundColor: colors[randomcolor] }, 500);
-    $("blockquote footer").animate({ color: colors[randomcolor] }, 500);
-    $("blockquote").animate({ borderLeftColor: colors[randomcolor] }, 500);
-    $("#quotetext").animate({ opacity: 0 }, 500, function () {
-      $(this).animate({ opacity: 1 }, 500);
-      $(this).text(currentQuote);
+  // Get random color
+  randomcolor = Math.floor(Math.random() * colors.length);
+
+  // Fetch quote from API
+  fetch("https://api.quotable.io/random")
+    .then((res) => res.json())
+    .then((data) => {
+      currentQuote = data.content;
+      currentAuthor = data.author;
+
+      // Update tweet link
+      $("#tweet-quote").attr(
+        "href",
+        "https://twitter.com/intent/tweet?hashtags=quotes&text=" +
+          encodeURIComponent('"' + currentQuote + '" - ' + currentAuthor)
+      );
+
+      // Animate the quote change
+      animateQuoteChange();
+    })
+    .catch((error) => {
+      console.error("Error fetching quote:", error);
+      // Fallback to local quotes if API fails
+      const localQuotes = [
+        [
+          "You only live once, but if you do it right, once is enough.",
+          "Mae West",
+        ],
+        [
+          "I am so clever that sometimes I don't understand a single word of what I am saying.",
+          "Oscar Wilde",
+        ],
+        [
+          "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe.",
+          "Albert Einstein",
+        ],
+      ];
+      const randomLocal = Math.floor(Math.random() * localQuotes.length);
+      currentQuote = localQuotes[randomLocal][0];
+      currentAuthor = localQuotes[randomLocal][1];
+      animateQuoteChange();
+    })
+    .finally(() => {
+      $("#newquote").html("New Quote").prop("disabled", false);
     });
-    $("#quotesource").animate({ opacity: 0 }, 500, function () {
-      $(this).animate({ opacity: 1 }, 500);
-      $(this).text(currentAuthor);
-    });
+}
+
+function animateQuoteChange() {
+  $("html body").animate(
+    {
+      backgroundColor: colors[randomcolor],
+      color: colors[randomcolor],
+    },
+    500
+  );
+  $(
+    "#newquote, .social-icons .fa-twitter, .social-icons .fa-volume-up, .social-icons .fa-copy"
+  ).animate({ backgroundColor: colors[randomcolor] }, 500);
+  $("blockquote footer").animate({ color: colors[randomcolor] }, 500);
+  $("blockquote").animate({ borderLeftColor: colors[randomcolor] }, 500);
+  $("#quotetext").animate({ opacity: 0 }, 500, function () {
+    $(this).animate({ opacity: 1 }, 500);
+    $(this).text(currentQuote);
+  });
+  $("#quotesource").animate({ opacity: 0 }, 500, function () {
+    $(this).animate({ opacity: 1 }, 500);
+    $(this).text(currentAuthor);
   });
 }
 
@@ -113,18 +114,41 @@ function openURL(url) {
   );
 }
 
+// Text-to-speech functionality
+function speakQuote() {
+  const utterance = new SpeechSynthesisUtterance(
+    `${currentQuote} by ${currentAuthor}`
+  );
+  speechSynthesis.speak(utterance);
+}
+
+// Copy quote functionality
+function copyQuote() {
+  navigator.clipboard
+    .writeText(`"${currentQuote}" - ${currentAuthor}`)
+    .then(() => {
+      // Show feedback
+      const originalTitle = $("#copy-quote").attr("title");
+      $("#copy-quote").attr("title", "Copied!");
+      setTimeout(() => $("#copy-quote").attr("title", originalTitle), 2000);
+    })
+    .catch((err) => console.error("Failed to copy: ", err));
+}
+
+// Initialize
 getQuote();
 
 $(document).ready(function () {
+  console.log("ready!");
   $("#newquote").on("click", getQuote);
-  $("#tweetquote").on("click", function () {
-    console.log("Tweeting");
+  $("#speak-quote").on("click", speakQuote);
+  $("#copy-quote").on("click", copyQuote);
+
+  // Twitter button click handler
+  $("#tweet-quote").on("click", function (e) {
     if (!inIframe()) {
-      console.log("Tweeting from main window");
-      openURL(
-        "https://twitter.com/intent/tweet?hashtags=quotes&related=freecodecamp&text=" +
-          encodeURIComponent('"' + currentQuote + '" ' + currentAuthor)
-      );
+      e.preventDefault();
+      openURL($(this).attr("href"));
     }
   });
 });
