@@ -1,5 +1,7 @@
 # Quotes - Random Quotes Generator
 
+<img width="1311" alt="Screenshot 2025-04-26 at 8 11 50 PM" src="https://github.com/user-attachments/assets/5dae52f4-bb1f-40ba-abab-9a1d46dd181e" />
+
 🚀 **Quotes** is an open-source random quotes generator web app. It generates new quotes on a button click and provides additional features like copying quotes, text-to-speech, and Twitter sharing.
 
 ## 🔗 Live Demo
